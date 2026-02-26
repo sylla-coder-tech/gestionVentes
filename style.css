@@ -1,0 +1,239 @@
+:root{
+  --bg:#0b1220;
+  --card:#0f1b2e;
+  --card2:#101f36;
+  --text:#eaf0ff;
+  --muted:#a8b4d6;
+  --line:rgba(255,255,255,.08);
+  --primary:#4f7cff;
+  --danger:#ff4f6d;
+  --ok:#2ee59d;
+  --warn:#ffd24f;
+  --shadow: 0 14px 36px rgba(0,0,0,.35);
+  --radius: 18px;
+  --radius2: 14px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(79,124,255,.35), transparent 60%),
+              radial-gradient(1200px 600px at 110% 0%, rgba(46,229,157,.18), transparent 55%),
+              var(--bg);
+  color:var(--text);
+}
+
+/* Header */
+.appHeader{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 14px;
+  background: rgba(11,18,32,.75);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.appTitle{display:flex; flex-direction:column; gap:2px; text-align:center}
+.brand{font-weight:900; letter-spacing:.2px}
+.subtitle{color:var(--muted); font-size:.9rem}
+.iconBtn{
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+  border-radius: 14px;
+  padding:10px 12px;
+  cursor:pointer;
+}
+
+/* Drawer */
+.backdrop{
+  position:fixed; inset:0; z-index:60;
+  background: rgba(0,0,0,.55);
+}
+.drawer{
+  position:fixed; z-index:70;
+  left:0; top:0; height:100%; width:min(320px, 86vw);
+  background: linear-gradient(180deg, rgba(15,27,46,.98), rgba(15,27,46,.92));
+  border-right:1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding:14px;
+}
+.hidden{display:none !important;}
+.drawerHead{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
+.drawerBrand{font-weight:900}
+.drawerNav{display:flex; flex-direction:column; gap:10px; margin-top:12px}
+.navItem{
+  width:100%;
+  text-align:left;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+  border-radius: 14px;
+  padding:12px 12px;
+  cursor:pointer;
+  font-weight:800;
+}
+.navItem.active{outline:2px solid rgba(79,124,255,.55)}
+.drawerFooter{position:absolute; bottom:14px; left:14px; right:14px; color:var(--muted); font-size:.85rem}
+
+/* Main */
+.appMain{padding:14px; max-width:1100px; margin:0 auto}
+.card{
+  background: linear-gradient(180deg, rgba(16,31,54,.86), rgba(15,27,46,.86));
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  padding:14px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.25);
+  margin-bottom:14px;
+}
+.cardHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom: 10px; /* ✅ décalage avec le tableau */
+}
+.cardHead h2{margin:0; font-size:1.05rem}
+
+.toolbarRight{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding-bottom: 2px; /* ✅ petit espace visuel */
+}
+
+/* Buttons & inputs */
+.select, input, button{font: inherit}
+.btn{
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+  border-radius: 14px;
+  padding:10px 12px;
+  cursor:pointer;
+  font-weight:900;
+}
+.btn.primary{background: rgba(79,124,255,.22); border-color: rgba(79,124,255,.55)}
+.btn.ghost{background: transparent}
+
+/* KPI */
+.gridKpi{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+  margin-bottom:14px;
+}
+.kpiCard{
+  background: rgba(255,255,255,.06);
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  padding:14px;
+}
+.kpiLabel{color:var(--muted); font-size:.92rem}
+.kpiValue{font-weight:950; font-size:1.55rem; margin-top:6px}
+.kpiHint{color:var(--muted); font-size:.85rem; margin-top:4px}
+
+/* Table */
+.tableWrap{
+  overflow:auto;
+  border-radius: var(--radius2);
+  border:1px solid var(--line);
+  margin-top: 10px; /* ✅ décalage supplémentaire */
+}
+.proTable{
+  width:100%;
+  border-collapse:collapse;
+  min-width:840px;
+  background: rgba(0,0,0,.12)
+}
+.proTable th,.proTable td{
+  padding:10px 10px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  vertical-align:top
+}
+.proTable th{
+  color:var(--muted);
+  font-size:.9rem;
+  background: rgba(255,255,255,.04)
+}
+.badge{
+  display:inline-flex; align-items:center;
+  padding:4px 10px; border-radius:999px; font-size:.82rem; font-weight:900;
+  border:1px solid var(--line);
+}
+.badge.ok{background: rgba(46,229,157,.18)}
+.badge.wait{background: rgba(255,210,79,.14)}
+.badge.danger{background: rgba(255,79,109,.14)}
+.miniImg{width:40px; height:40px; border-radius:12px; object-fit:cover; border:1px solid var(--line)}
+
+/* Toast */
+.toast{
+  position:fixed; z-index:80;
+  left:50%; transform:translateX(-50%);
+  bottom:14px;
+  width:min(520px, calc(100vw - 28px));
+  background: rgba(16,31,54,.95);
+  border:1px solid var(--line);
+  border-radius: 14px;
+  padding:12px 14px;
+  box-shadow: var(--shadow);
+}
+
+/* Modal / Bottom sheet */
+.modal{
+  position:fixed; inset:0; z-index:90;
+  background: rgba(0,0,0,.55);
+  display:flex; align-items:flex-end; justify-content:center;
+  padding:14px
+}
+.sheet{
+  width:min(760px, 100%);
+  background: linear-gradient(180deg, rgba(16,31,54,.98), rgba(15,27,46,.98));
+  border:1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding:14px;
+}
+.sheetHead{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
+.sheetTitle{font-weight:950}
+.formGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:10px;
+}
+.field{display:flex; flex-direction:column; gap:6px}
+.field span{color:var(--muted); font-weight:800; font-size:.92rem}
+.field input, .select{
+  padding:12px;
+  border-radius: 14px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+}
+.field.full{grid-column:1/-1}
+.smallMuted{color:var(--muted); font-size:.85rem}
+
+.sheetActions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+.sheetActions .btn{flex:1}
+
+/* Confirm modal */
+.confirmBody{
+  padding: 8px 2px 2px;
+  line-height: 1.35;
+}
+
+/* Responsive */
+@media (min-width: 860px){
+  .gridKpi{grid-template-columns: 1fr 1fr 1fr;}
+  .formGrid{grid-template-columns: 1fr 1fr;}
+  .field.full{grid-column: 1 / -1;}
+  .modal{align-items:center;}
+  .sheet{border-radius: 18px;}
+}
