@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const BUCKET = "product-images";
 
-  // ===== UI refs
   const drawer = document.getElementById("drawer");
   const backdrop = document.getElementById("backdrop");
   const btnMenu = document.getElementById("btnMenu");
@@ -14,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const headerSubtitle = document.getElementById("headerSubtitle");
   const toast = document.getElementById("toast");
 
-  // Views
   const views = {
     dashboard: document.getElementById("view-dashboard"),
     stock: document.getElementById("view-stock"),
@@ -22,9 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Dashboard
-  const kpiRevenue = document.getElementById("kpiRevenue");
+  const kpiRevenue = document.getElementById("kpiRevenue");     // somme prixAchat
   const kpiSalesCount = document.getElementById("kpiSalesCount");
-  const kpiProfit = document.getElementById("kpiProfit");
+  const kpiProfit = document.getElementById("kpiProfit");       // somme (prixAchat - livraison)
   const dashFilter = document.getElementById("dashFilter");
   const dashSalesBody = document.getElementById("dashSalesBody");
 
@@ -32,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stockBody = document.getElementById("stockBody");
   const btnOpenAddProduct = document.getElementById("btnOpenAddProduct");
 
-  // Sales
+  // Ventes
   const salesBody = document.getElementById("salesBody");
   const btnOpenAddSale = document.getElementById("btnOpenAddSale");
 
@@ -66,10 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const telephone = document.getElementById("telephone");
   const adresse = document.getElementById("adresse");
 
-  // Cache
   let produitsCache = [];
 
-  // ===== Helpers
   function showToast(message) {
     toast.textContent = message;
     toast.classList.remove("hidden");
@@ -96,11 +92,10 @@ document.addEventListener("DOMContentLoaded", () => {
     drawer.classList.add("hidden");
     backdrop.classList.add("hidden");
   }
-
   function openModal(modal) { modal.classList.remove("hidden"); }
   function closeModal(modal) { modal.classList.add("hidden"); }
 
-  // ===== ConfirmModal (mobile premium)
+  // ConfirmModal
   const confirmModal = document.getElementById("confirmModal");
   const confirmTitle = document.getElementById("confirmTitle");
   const confirmMessage = document.getElementById("confirmMessage");
@@ -113,37 +108,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function confirmSheet({ title = "Confirmation", message = "Confirmer ?" } = {}) {
     confirmTitle.textContent = title;
     confirmMessage.textContent = message;
-
-    // vibration mobile (si dispo)
     try { navigator.vibrate?.(35); } catch(_) {}
-
     openModal(confirmModal);
-
-    return new Promise((resolve) => {
-      _confirmResolve = resolve;
-    });
+    return new Promise((resolve) => { _confirmResolve = resolve; });
   }
-
   function closeConfirm(result) {
     closeModal(confirmModal);
-    if (_confirmResolve) {
-      _confirmResolve(result);
-      _confirmResolve = null;
-    }
+    if (_confirmResolve) { _confirmResolve(result); _confirmResolve = null; }
   }
-
   btnCloseConfirm?.addEventListener("click", () => closeConfirm(false));
   btnConfirmCancel?.addEventListener("click", () => closeConfirm(false));
   btnConfirmOk?.addEventListener("click", () => closeConfirm(true));
-  confirmModal?.addEventListener("click", (e) => {
-    if (e.target === confirmModal) closeConfirm(false);
-  });
+  confirmModal?.addEventListener("click", (e) => { if (e.target === confirmModal) closeConfirm(false); });
 
-  // ===== Router
   function routeTo(route) {
     Object.keys(views).forEach(r => views[r].classList.toggle("hidden", r !== route));
     document.querySelectorAll(".navItem").forEach(b => b.classList.toggle("active", b.dataset.route === route));
-
     headerSubtitle.textContent = route === "dashboard" ? "Dashboard" : route === "stock" ? "Stock" : "Ventes";
     closeDrawer();
 
@@ -152,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (route === "ventes") loadSales();
   }
 
-  // ===== Storage upload
   async function uploadImageIfAny(file) {
     if (!file) return "";
     if (!file.type.startsWith("image/")) throw new Error("Fichier non image");
@@ -167,9 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return data.publicUrl;
   }
 
-  // =========================
-  // DASHBOARD
-  // =========================
+  // ========================= DASHBOARD =========================
   async function loadDashboard() {
     const filter = dashFilter.value;
 
@@ -186,34 +163,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const rows = (data || []).filter(v => filter === "all" ? true : v.statut === filter);
 
-    let revenue = 0;
-    let profit = 0;
+    // KPI: total prixAchat + total caisse(prixAchat - livraison)
+    let totalPrixAchat = 0;
+    let totalCaisse = 0;
+
     rows.forEach(v => {
-      revenue += Number(v.prixUnitaire || 0) - Number(v.fraisLivraison || 0);
-      profit += Number(v.benefice || 0);
+      const pa = Number(v.prixAchat || 0);
+      const liv = Number(v.fraisLivraison || 0);
+      totalPrixAchat += pa;
+      totalCaisse += (pa - liv);
     });
 
-    kpiRevenue.textContent = formatGNF(revenue);
+    kpiRevenue.textContent = formatGNF(totalPrixAchat);
     kpiSalesCount.textContent = String(rows.length);
-    kpiProfit.textContent = formatGNF(profit);
+    kpiProfit.textContent = formatGNF(totalCaisse);
 
     if (!rows.length) {
-      dashSalesBody.innerHTML = `<tr><td colspan="9">Aucune vente.</td></tr>`;
+      dashSalesBody.innerHTML = `<tr><td colspan="10">Aucune vente.</td></tr>`;
       return;
     }
 
     dashSalesBody.innerHTML = rows.slice(0, 25).map(v => {
-      const caisse = Number(v.prixUnitaire || 0) - Number(v.fraisLivraison || 0);
+      const caisse = Number(v.prixAchat || 0) - Number(v.fraisLivraison || 0);
+      const dateTxt = v.dateAchat ? new Date(v.dateAchat).toLocaleDateString("fr-FR") : "-";
+
       return `
         <tr>
           <td>${v.nomProduit}</td>
           <td>${v.nomClient} ${v.prenomClient}</td>
           <td>${v.telephone}</td>
           <td>${formatGNF(v.prixUnitaire)}</td>
+          <td>${formatGNF(v.prixAchat)}</td>
           <td>${formatGNF(v.fraisLivraison)}</td>
           <td><b>${formatGNF(caisse)}</b></td>
           <td>${badgeHtml(v.statut)}</td>
-          <td>${new Date(v.dateAchat).toLocaleDateString("fr-FR")}</td>
+          <td>${dateTxt}</td>
           <td>
             <button class="btn" data-edit-sale="${v.id}">Modifier</button>
             <button class="btn" data-del-sale="${v.id}" style="border-color:rgba(255,79,109,.55); background:rgba(255,79,109,.12)">Supprimer</button>
@@ -227,9 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   dashFilter.addEventListener("change", loadDashboard);
 
-  // =========================
-  // STOCK
-  // =========================
+  // ========================= STOCK =========================
   async function loadStock() {
     const { data, error } = await supabase
       .from("produits")
@@ -273,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
         prix.value = p.prixUnitaire ?? 0;
         stock.value = p.stock ?? 0;
         imageFile.value = "";
-
         openModal(productModal);
       });
     });
@@ -281,7 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
     stockBody.querySelectorAll("[data-del-product]").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = Number(btn.dataset.delProduct);
-
         const ok = await confirmSheet({
           title: "Supprimer le produit",
           message: "Voulez-vous vraiment supprimer ce produit ? Cette action est définitive."
@@ -314,7 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   productForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     try {
       const payload = {
         reference: reference.value.trim(),
@@ -348,9 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // =========================
-  // VENTES
-  // =========================
+  // ========================= VENTES =========================
   async function loadProductsForSalesSelect() {
     const { data, error } = await supabase
       .from("produits")
@@ -382,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateProdHint() {
     const p = getSelectedProduct();
     if (!p) { prodHint.textContent = ""; return; }
-    prodHint.textContent = `Prix: ${formatGNF(p.prixUnitaire)} • Stock: ${p.stock}`;
+    prodHint.textContent = `Prix stock: ${formatGNF(p.prixUnitaire)} • Stock: ${p.stock}`;
   }
   produit_id.addEventListener("change", updateProdHint);
 
@@ -395,27 +372,33 @@ document.addEventListener("DOMContentLoaded", () => {
     if (error) { showToast("Erreur ventes: " + error.message); return; }
 
     if (!data || !data.length) {
-      salesBody.innerHTML = `<tr><td colspan="10">Aucune vente.</td></tr>`;
+      salesBody.innerHTML = `<tr><td colspan="11">Aucune vente.</td></tr>`;
       return;
     }
 
-    salesBody.innerHTML = data.map(v => `
-      <tr>
-        <td>${v.nomProduit}</td>
-        <td>${v.nomClient} ${v.prenomClient}</td>
-        <td>${v.telephone}</td>
-        <td>${formatGNF(v.prixUnitaire)}</td>
-        <td>${formatGNF(v.prixAchat)}</td>
-        <td>${formatGNF(v.fraisLivraison)}</td>
-        <td><b>${formatGNF(v.benefice)}</b></td>
-        <td>${badgeHtml(v.statut)}</td>
-        <td>${new Date(v.dateAchat).toLocaleDateString("fr-FR")}</td>
-        <td>
-          <button class="btn" data-edit-sale="${v.id}">Modifier</button>
-          <button class="btn" data-del-sale="${v.id}" style="border-color:rgba(255,79,109,.55); background:rgba(255,79,109,.12)">Supprimer</button>
-        </td>
-      </tr>
-    `).join("");
+    salesBody.innerHTML = data.map(v => {
+      const caisse = Number(v.prixAchat || 0) - Number(v.fraisLivraison || 0);
+      const dateTxt = v.dateAchat ? new Date(v.dateAchat).toLocaleDateString("fr-FR") : "-";
+
+      return `
+        <tr>
+          <td>${v.nomProduit}</td>
+          <td>${v.nomClient} ${v.prenomClient}</td>
+          <td>${v.telephone}</td>
+          <td>${formatGNF(v.prixUnitaire)}</td>
+          <td>${formatGNF(v.prixAchat)}</td>
+          <td>${formatGNF(v.fraisLivraison)}</td>
+          <td><b>${formatGNF(caisse)}</b></td>
+          <td><b>${formatGNF(v.benefice)}</b></td>
+          <td>${badgeHtml(v.statut)}</td>
+          <td>${dateTxt}</td>
+          <td>
+            <button class="btn" data-edit-sale="${v.id}">Modifier</button>
+            <button class="btn" data-del-sale="${v.id}" style="border-color:rgba(255,79,109,.55); background:rgba(255,79,109,.12)">Supprimer</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
 
     bindSaleRowActions(salesBody);
   }
@@ -433,6 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         saleModalTitle.textContent = "Modifier vente";
         saleId.value = data.id;
+
         await loadProductsForSalesSelect();
         produit_id.value = String(data.produit_id);
         updateProdHint();
@@ -463,7 +447,6 @@ document.addEventListener("DOMContentLoaded", () => {
           .from("ventes")
           .select("id, produit_id")
           .eq("id", id).single();
-
         if (ve) return showToast("Erreur: " + ve.message);
 
         const { error: de } = await supabase.from("ventes").delete().eq("id", id);
@@ -527,17 +510,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (Number.isNaN(payload.prixAchat) || Number.isNaN(payload.fraisLivraison)) return showToast("Prix invalides");
 
-    payload.benefice = Number(p.prixUnitaire) - payload.prixAchat - payload.fraisLivraison;
+    // ✅ TA RÈGLE : benefice = prixAchat - livraison
+    payload.benefice = payload.prixAchat - payload.fraisLivraison;
 
     if (saleId.value) {
       const id = Number(saleId.value);
 
-      const { data: old, error: oe } = await supabase.from("ventes").select("id, produit_id").eq("id", id).single();
+      const { data: old, error: oe } = await supabase
+        .from("ventes")
+        .select("id, produit_id")
+        .eq("id", id).single();
       if (oe) return showToast(oe.message);
-      payload.produit_id = old.produit_id;
 
-      const { data: pr, error: pre } = await supabase.from("produits").select('"prixUnitaire", image').eq("id", old.produit_id).single();
-      if (!pre) payload.benefice = Number(pr.prixUnitaire) - payload.prixAchat - payload.fraisLivraison;
+      payload.produit_id = old.produit_id;
 
       const { error } = await supabase.from("ventes").update(payload).eq("id", id);
       if (error) return showToast("Update KO: " + error.message);
@@ -547,7 +532,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const { error } = await supabase.from("ventes").insert([payload]);
       if (error) return showToast("Insert KO: " + error.message);
 
-      const { error: se } = await supabase.from("produits").update({ stock: p.stock - 1 }).eq("id", p.id);
+      const { error: se } = await supabase
+        .from("produits")
+        .update({ stock: p.stock - 1 })
+        .eq("id", p.id);
       if (se) return showToast("Vente OK mais stock KO: " + se.message);
 
       showToast("Vente ajoutée ✅ (stock -1)");
@@ -576,6 +564,5 @@ document.addEventListener("DOMContentLoaded", () => {
     if (current === "ventes") await loadSales();
   });
 
-  // Init
   routeTo("dashboard");
 });

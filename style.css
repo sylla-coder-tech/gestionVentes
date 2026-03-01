@@ -1,14 +1,9 @@
 :root{
   --bg:#0b1220;
-  --card:#0f1b2e;
-  --card2:#101f36;
   --text:#eaf0ff;
   --muted:#a8b4d6;
   --line:rgba(255,255,255,.08);
   --primary:#4f7cff;
-  --danger:#ff4f6d;
-  --ok:#2ee59d;
-  --warn:#ffd24f;
   --shadow: 0 14px 36px rgba(0,0,0,.35);
   --radius: 18px;
   --radius2: 14px;
@@ -37,6 +32,7 @@ body{
 .appTitle{display:flex; flex-direction:column; gap:2px; text-align:center}
 .brand{font-weight:900; letter-spacing:.2px}
 .subtitle{color:var(--muted); font-size:.9rem}
+
 .iconBtn{
   border:1px solid var(--line);
   background: rgba(255,255,255,.06);
@@ -46,11 +42,10 @@ body{
   cursor:pointer;
 }
 
+.hidden{display:none !important;}
+
 /* Drawer */
-.backdrop{
-  position:fixed; inset:0; z-index:60;
-  background: rgba(0,0,0,.55);
-}
+.backdrop{position:fixed; inset:0; z-index:60; background: rgba(0,0,0,.55);}
 .drawer{
   position:fixed; z-index:70;
   left:0; top:0; height:100%; width:min(320px, 86vw);
@@ -59,13 +54,11 @@ body{
   box-shadow: var(--shadow);
   padding:14px;
 }
-.hidden{display:none !important;}
 .drawerHead{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
 .drawerBrand{font-weight:900}
 .drawerNav{display:flex; flex-direction:column; gap:10px; margin-top:12px}
 .navItem{
-  width:100%;
-  text-align:left;
+  width:100%; text-align:left;
   border:1px solid var(--line);
   background: rgba(255,255,255,.06);
   color:var(--text);
@@ -88,23 +81,13 @@ body{
   margin-bottom:14px;
 }
 .cardHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom: 10px; /* ✅ décalage avec le tableau */
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+  margin-bottom: 10px;
 }
 .cardHead h2{margin:0; font-size:1.05rem}
+.toolbarRight{display:flex; align-items:center; gap:10px}
 
-.toolbarRight{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding-bottom: 2px; /* ✅ petit espace visuel */
-}
-
-/* Buttons & inputs */
 .select, input, button{font: inherit}
 .btn{
   border:1px solid var(--line);
@@ -117,6 +100,8 @@ body{
 }
 .btn.primary{background: rgba(79,124,255,.22); border-color: rgba(79,124,255,.55)}
 .btn.ghost{background: transparent}
+
+.smallMuted{color:var(--muted); font-size:.85rem}
 
 /* KPI */
 .gridKpi{
@@ -140,12 +125,12 @@ body{
   overflow:auto;
   border-radius: var(--radius2);
   border:1px solid var(--line);
-  margin-top: 10px; /* ✅ décalage supplémentaire */
+  margin-top: 10px;
 }
 .proTable{
   width:100%;
   border-collapse:collapse;
-  min-width:840px;
+  min-width:980px;
   background: rgba(0,0,0,.12)
 }
 .proTable th,.proTable td{
@@ -161,12 +146,13 @@ body{
 }
 .badge{
   display:inline-flex; align-items:center;
-  padding:4px 10px; border-radius:999px; font-size:.82rem; font-weight:900;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:.82rem; font-weight:900;
   border:1px solid var(--line);
 }
 .badge.ok{background: rgba(46,229,157,.18)}
 .badge.wait{background: rgba(255,210,79,.14)}
-.badge.danger{background: rgba(255,79,109,.14)}
 .miniImg{width:40px; height:40px; border-radius:12px; object-fit:cover; border:1px solid var(--line)}
 
 /* Toast */
@@ -186,7 +172,9 @@ body{
 .modal{
   position:fixed; inset:0; z-index:90;
   background: rgba(0,0,0,.55);
-  display:flex; align-items:flex-end; justify-content:center;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
   padding:14px
 }
 .sheet{
@@ -199,6 +187,8 @@ body{
 }
 .sheetHead{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
 .sheetTitle{font-weight:950}
+
+/* Form */
 .formGrid{
   display:grid;
   grid-template-columns: 1fr;
@@ -214,8 +204,8 @@ body{
   color:var(--text);
 }
 .field.full{grid-column:1/-1}
-.smallMuted{color:var(--muted); font-size:.85rem}
 
+/* Actions (sticky mobile) */
 .sheetActions{
   display:flex;
   gap:10px;
@@ -223,13 +213,42 @@ body{
 }
 .sheetActions .btn{flex:1}
 
-/* Confirm modal */
-.confirmBody{
-  padding: 8px 2px 2px;
-  line-height: 1.35;
+.confirmBody{padding: 8px 2px 2px; line-height: 1.35;}
+
+/* ✅ RESPONSIVE PRO POUR MOBILE (modal vente/produit) */
+@media (max-width: 720px){
+  /* éviter zoom iPhone */
+  input, select, textarea { font-size: 16px; }
+
+  .modal{padding:10px; align-items:flex-end;}
+  .sheet{
+    border-radius: 18px 18px 0 0;
+    max-height: 92vh;
+    overflow: hidden; /* important */
+  }
+
+  /* Le formulaire doit scroller si trop long */
+  .sheet form{
+    max-height: calc(92vh - 70px); /* laisse la place au header du modal */
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+  }
+
+  /* Boutons toujours visibles */
+  .sheetActions{
+    position: sticky;
+    bottom: 0;
+    background: rgba(15,27,46,.92);
+    backdrop-filter: blur(8px);
+    padding-top: 10px;
+  }
+
+  /* Table plus exploitable */
+  .proTable{min-width: 1050px;}
 }
 
-/* Responsive */
+/* Desktop */
 @media (min-width: 860px){
   .gridKpi{grid-template-columns: 1fr 1fr 1fr;}
   .formGrid{grid-template-columns: 1fr 1fr;}

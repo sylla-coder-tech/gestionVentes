@@ -19,7 +19,6 @@
     <button class="iconBtn" id="btnRefresh" aria-label="Rafraîchir">⟳</button>
   </header>
 
-  <!-- Drawer -->
   <div class="backdrop hidden" id="backdrop"></div>
   <aside class="drawer hidden" id="drawer">
     <div class="drawerHead">
@@ -45,9 +44,9 @@
     <section class="view" id="view-dashboard">
       <div class="gridKpi">
         <div class="kpiCard">
-          <div class="kpiLabel">Revenus nets (caisse)</div>
+          <div class="kpiLabel">Total ventes (prix d’achat)</div>
           <div class="kpiValue" id="kpiRevenue">0 GNF</div>
-          <div class="kpiHint">Après frais de livraison déduits</div>
+          <div class="kpiHint">Somme de tous les prix d’achat</div>
         </div>
 
         <div class="kpiCard">
@@ -57,9 +56,9 @@
         </div>
 
         <div class="kpiCard">
-          <div class="kpiLabel">Bénéfice total</div>
+          <div class="kpiLabel">Caisse totale (achat - livraison)</div>
           <div class="kpiValue" id="kpiProfit">0 GNF</div>
-          <div class="kpiHint">Somme de bénéfice</div>
+          <div class="kpiHint">Somme (prix d’achat - frais livraison)</div>
         </div>
       </div>
 
@@ -83,7 +82,8 @@
                 <th>Produit</th>
                 <th>Client</th>
                 <th>Tél</th>
-                <th>Prix</th>
+                <th>Prix stock</th>
+                <th>Prix d’achat</th>
                 <th>Livraison</th>
                 <th>Caisse</th>
                 <th>Statut</th>
@@ -144,9 +144,10 @@
                 <th>Produit</th>
                 <th>Client</th>
                 <th>Tél</th>
-                <th>Prix</th>
-                <th>Achat</th>
+                <th>Prix stock</th>
+                <th>Prix d’achat</th>
                 <th>Livraison</th>
+                <th>Caisse</th>
                 <th>Bénéfice</th>
                 <th>Statut</th>
                 <th>Date</th>
@@ -269,7 +270,7 @@
     </div>
   </div>
 
-  <!-- CONFIRM MODAL (mobile premium) -->
+  <!-- CONFIRM MODAL -->
   <div class="modal hidden" id="confirmModal">
     <div class="sheet">
       <div class="sheetHead">
